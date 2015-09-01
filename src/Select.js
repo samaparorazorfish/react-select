@@ -237,22 +237,27 @@ var Select = React.createClass({
 	handleMouseDown: function(event) {
 		// if the event was triggered by a mousedown and not the primary
 		// button, or if the component is disabled, ignore it.
-		if (this.props.disabled || (event.type == 'mousedown' && event.button !== 0)) {
+		if (this.props.disabled || event.type == "mousedown" && event.button !== 0) {
 			return;
 		}
-		
+
 		event.stopPropagation();
 		event.preventDefault();
-		if (this.state.isFocused) {
+		if(!this.props.searchable && this.state.isOpen) {
 			this.setState({
-				isOpen: true
+				isOpen: false
 			});
 		} else {
-			this._openAfterFocus = true;
-			this.getInputNode().focus();
+			if (this.state.isFocused) {
+				this.setState({
+					isOpen: true
+				});
+			} else {
+				this._openAfterFocus = true;
+				this.getInputNode().focus();
+			}
 		}
 	},
-
 	handleInputFocus: function(event) {
 		this.setState({
 			isFocused: true,
