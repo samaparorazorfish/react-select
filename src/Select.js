@@ -258,6 +258,15 @@ var Select = React.createClass({
 			}
 		}
 	},
+	handleMouseDownOnMenu: function(event) {
+		// if the event was triggered by a mousedown and not the primary
+		// button, or if the component is disabled, ignore it.
+		if (this.props.disabled || (event.type === 'mousedown' && event.button !== 0)) {
+			return;
+		}
+		event.stopPropagation();
+		event.preventDefault();
+	},
 	handleInputFocus: function(event) {
 		this.setState({
 			isFocused: true,
@@ -271,6 +280,10 @@ var Select = React.createClass({
 	},
 
 	handleInputBlur: function(event) {
+		if (this.refs.menu && document.activeElement.isEqualNode(this.refs.menu.getDOMNode())) {
+			this.getInputNode().focus();
+			return;
+		}
 		this._blurTimeout = setTimeout(function() {
 			if (this._focusAfterUpdate) return;
 			this.setState({
@@ -571,11 +584,9 @@ var Select = React.createClass({
 		if (this.state.isOpen) {
 			menuProps = {
 				ref: "menu",
-				className: "Select-menu"
+				className: "Select-menu",
+				onMouseDown: this.handleMouseDownOnMenu
 			};
-			if (this.props.multi) {
-				menuProps.onMouseDown = this.handleMouseDown;
-			}
 			menu = (
 				<div className="Select-menu-outer">
 					<div {...menuProps}>{this.buildMenu()}</div>
